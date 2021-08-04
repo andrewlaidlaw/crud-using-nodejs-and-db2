@@ -17,47 +17,61 @@ app.use(function (req, res, next) {
     next();
 });
 
-
-const { WatsonMLScoringEndpoint } = require("watson-ml-model-utils");
-
-
-var features = ['LOTAREA', 'BLDGTYPE', 'HOUSESTYLE', 'OVERALLCOND', 'YEARBUILT',
-       'ROOFSTYLE', 'EXTERCOND', 'FOUNDATION', 'BSMTCOND', 'HEATING',
-       'HEATINGQC', 'CENTRALAIR', 'ELECTRICAL', 'FULLBATH', 'HALFBATH',
-       'BEDROOMABVGR', 'KITCHENABVGR', 'KITCHENQUAL', 'TOTRMSABVGRD',
-       'FIREPLACES', 'FIREPLACEQU', 'GARAGETYPE', 'GARAGEFINISH', 'GARAGECARS',
-       'GARAGECOND', 'POOLAREA', 'POOLQC', 'FENCE', 'MOSOLD', 'YRSOLD' ];
-
-
-let endpoint = new WatsonMLScoringEndpoint(features, {
-         servicePath: process.env.WML_SERVICEPATH,
-         username: process.env.WML_UID,
-         password: process.env.WML_PWD,
-         instanceId: process.env.WML_INSTANCEID,
-         modelId: process.env.WML_MODELID,
-         deploymentId: process.env.WML_DEPLOYMENTID
- });
-
-var NodeGeocoder = require('node-geocoder');
-
-var options = {
-  provider: 'mapquest',
-
-  // Optional depending on the providers
-  httpAdapter: 'https', // Default
-  apiKey: 'puEBOpI1vnXm8RZgz3dS5qJ7KhYQGYew', // for Mapquest, OpenCage, Google Premier
-  formatter: null         // 'gpx', 'string', ...
-};
-
-var geocoder = NodeGeocoder(options);
-
-
 let connStr = "DATABASE="+process.env.DB_DATABASE+";HOSTNAME="+process.env.DB_HOSTNAME+";PORT="+process.env.DB_PORT+";PROTOCOL=TCPIP;UID="+process.env.DB_UID+";PWD="+process.env.DB_PWD+";";
 
+app.get('/getProducts', function(request, response) {
+  console.log("Request for /getProducts");
+  ibmdb.open(connStr, function (err,conn) {
+    if (err){
+      return response.json({success:-1, message:err});
+    }
+    conn.query("SELECT * FROM "+process.env.DB_SCHEMA+".PRODUCT;", function (err,data) {
+      if (err){
+        return response.json({success:-2,message:err});
+      }
+      conn.close(function () {
+        return response.json({success:1, message:'Data Received!', data:data});
+      });
+    })
+  })
+})
+
+app.get('/getEmployee', function(request, response) {
+  console.log("Request for /getEmployee with Employee Number "+request.query.id);
+  ibmdb.open(connStr, function (err,conn) {
+    if (err){
+      return response.json({success:-1, message:err});
+    }
+    conn.query("SELECT * FROM "+process.env.DB_SCHEMA+".EMPLOYEE WHERE EMPNO="+request.query.id+";", function (err,data) {
+      if (err){
+        return response.json({success:-2,message:err});
+      }
+      conn.close(function () {
+        return response.json({success:1, message:'Data Received!', data:data});
+      });
+    })
+  })
+})
+
+app.get('/getEmployees', function(request, response) {
+  console.log("Request for /getEmployees");
+  ibmdb.open(connStr, function (err,conn) {
+    if (err){
+      return response.json({success:-1, message:err});
+    }
+    conn.query("SELECT EMPNO,FIRSTNME,LASTNAME,JOB FROM "+process.env.DB_SCHEMA+".EMPLOYEE;", function (err,data) {
+      if (err){
+        return response.json({success:-2,message:err});
+      }
+      conn.close(function () {
+        return response.json({success:1, message:'Data Received!', data:data});
+      });
+    })
+  })
+})
 
 
 
-//let connStr = "DATABASE=BLUDB;HOSTNAME=db2whoc-flex-zipnqsp.services.au-syd.bluemix.net;PORT=50000;PROTOCOL=TCPIP;UID=bluadmin;PWD=zWG@U4q1uFpDTi0v8jVBDI7_PtSr0;";
 
  app.post('/newDataEntry', function(request, response){
    var house = JSON.parse(request.body['house']);
@@ -108,7 +122,7 @@ app.post('/getData', function(request, response){
      }
      conn.query("SELECT * FROM "+process.env.DB_SCHEMA+".HOME_SALES ORDER BY ID DESC LIMIT "+request.body.num+";", function (err, data) {
        if (err){
-         return response.json({success:-1, message:err});
+         return response.json({success:-2, message:err});
        }
        conn.close(function () {
          return response.json({success:1, message:'Data Received!', data:data});
@@ -226,77 +240,6 @@ app.post('/deleteData', function(request, response){
      });
    });
 })
-
-
-app.post('/WML_Predict', function(request, response){
-    endpoint.score(request.body.values).then(
-      output => {
-          console.log(output.prediction);
-          return response.json({success:1, value:output.prediction});
-      }).catch(err => console.log(err));
-})
-
-app.get('/predict', function(request, response){
-  console.log(request);
-   return response.json({
-        "address1":"10892 Northfield Sq",
-        "address2": "",
-        "city":"Sunnyvale",
-        "state":"CA",
-        "zipcode":95014,
-        "country":"US",
-         "lotArea": 1000,
-        "bldgType": "Duplx",
-        "houseStyle": "1.5Fin",
-        "overallCond": 8,
-        "yearBuilt": 1950,
-        "fullBath": 1,
-        "halfBath": 0,
-        "bedroomAbvGr": 2,
-        "kitchenAbvGr": 1,
-        "kitchenQual": "Gd",
-        "totalRmsAbvGrd": 5,
-        "heating": "Floor",
-        "heatingQC": "Gd",
-        "centralAir": "Y",
-        "electrical": "SBrkr",
-        "roofStyle": "Gable",
-        "exterCond": "Gd",
-        "foundation": "CBlock",
-        "bsmtCond": "Gd",
-        "poolArea": 0,
-        "poolQC": "Gd",
-        "fireplaces": 0,
-        "fireplaceQu": "TA",
-        "garageType": "Basment",
-        "garageFinish": "RFn",
-        "garageCars": 1,
-        "garageCond": "Gd",
-        "fence": "GdPrv",
-        "moSold": 4,
-        "yrSold": 2010,
-        "salePrice":2123344.898989
-       });
-})
-
-app.post('/geocode', function(request, response){
-    // Using callback
-  if (request.body.address1 == ''){
-    return response.json({success:1, message:"no address"});
-  }
-  else {
-    geocoder.geocode(request.body.address1 + ", " + request.body.city + ", " + request.body.state + ", " + request.body.zipcode, function(err, res) {
-      if (err){
-          return response.json({success:-2, message:err});
-      }
-      else{
-        return response.json({success:1, message:"Map Loaded", data:res} );
-      }
-    });
-  }
-
-})
-
 
 app.listen(8888, function(){
     console.log("Server is listening on port 8888");
