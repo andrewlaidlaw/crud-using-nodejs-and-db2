@@ -2,7 +2,7 @@
 //@author Rohith Ravindranath
 //@version July 10 2019
 
-require('dotenv').config()
+// require('dotenv').config()
 var express=require('express');
 var app=express();
 var path=require('path');
@@ -16,6 +16,22 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+
+// Pull in environment variables
+const DB_DATABASE = process.env.db_database;
+const DB_HOSTNAME = process.env.db_hostname;
+const DB_PORT = process.env.db_port;
+const DB_UID = process.env.db_uid;
+const DB_PWD = process.env.db_pwd;
+const DB_SCHEMA = process.env.db_schema;
+
+// Test values
+//const DB_DATABASE=SAMPLE
+//const DB_HOSTNAME=p1284-pvm1.p1284.cecc.ihost.com
+//const DB_PORT=50000
+//const DB_UID=cecuser
+//const DB_PWD=BXUMWPH-VA%R6Mb
+//const DB_SCHEMA=CECUSER
 
 // Setup the endpoint for the Db2 database we are connecting to
 let connStr = "DATABASE="+process.env.DB_DATABASE+";HOSTNAME="+process.env.DB_HOSTNAME+";PORT="+process.env.DB_PORT+";PROTOCOL=TCPIP;UID="+process.env.DB_UID+";PWD="+process.env.DB_PWD+";";
