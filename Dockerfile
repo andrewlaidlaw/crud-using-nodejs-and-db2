@@ -1,6 +1,7 @@
-FROM ubi7/nodejs-12
+FROM node
 
-RUN sudo yum install -y libnuma-devel
+# RUN sudo yum install -y libnuma-devel
+RUN apt-get update && apt-get install libnuma-dev
 
 COPY package*.json .
 RUN npm install
