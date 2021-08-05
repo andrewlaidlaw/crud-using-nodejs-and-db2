@@ -1,4 +1,4 @@
-FROM openshift/nodejs
+FROM ubi7/nodejs-12
 
 RUN sudo yum install -y libnuma-devel
 
