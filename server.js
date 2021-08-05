@@ -17,8 +17,22 @@ app.use(function (req, res, next) {
     next();
 });
 
+// Setup the endpoint for the Db2 database we are connecting to
 let connStr = "DATABASE="+process.env.DB_DATABASE+";HOSTNAME="+process.env.DB_HOSTNAME+";PORT="+process.env.DB_PORT+";PROTOCOL=TCPIP;UID="+process.env.DB_UID+";PWD="+process.env.DB_PWD+";";
 
+// Basic healthcheck endpoint
+app.get('/healthz', function(request, response) {
+  console.log('Healthcheck');
+  response.send('ok');
+})
+
+// Simple JSON response for base service
+app.get('/', function(request, response) {
+  console.log('Request for /');
+  response.json({success:1, message:'service running'});
+})
+
+// Get an object containing all details of all products in the database
 app.get('/getProducts', function(request, response) {
   console.log("Request for /getProducts");
   ibmdb.open(connStr, function (err,conn) {
@@ -30,12 +44,13 @@ app.get('/getProducts', function(request, response) {
         return response.json({success:-2,message:err});
       }
       conn.close(function () {
-        return response.json({success:1, message:'Data Received!', data:data});
+        return response.json({success:1, message:'Data Received', data:data});
       });
     })
   })
 })
 
+// Get an object containing the full details of a particular employee identified by their ID
 app.get('/getEmployee', function(request, response) {
   console.log("Request for /getEmployee with Employee Number "+request.query.id);
   ibmdb.open(connStr, function (err,conn) {
@@ -47,12 +62,13 @@ app.get('/getEmployee', function(request, response) {
         return response.json({success:-2,message:err});
       }
       conn.close(function () {
-        return response.json({success:1, message:'Data Received!', data:data});
+        return response.json({success:1, message:'Data Received', data:data});
       });
     })
   })
 })
 
+// Get an object containing limited details of all employees in the database
 app.get('/getEmployees', function(request, response) {
   console.log("Request for /getEmployees");
   ibmdb.open(connStr, function (err,conn) {
@@ -71,7 +87,7 @@ app.get('/getEmployees', function(request, response) {
 })
 
 
-
+// The following endpoints are historical from the cloned Github repo, and are not used here
 
  app.post('/newDataEntry', function(request, response){
    var house = JSON.parse(request.body['house']);
@@ -241,6 +257,8 @@ app.post('/deleteData', function(request, response){
    });
 })
 
+// Start the server listening for clients
 app.listen(8080, function(){
     console.log("Server is listening on port 8080");
+    console.log('Connection string is: '+connStr)
 })
