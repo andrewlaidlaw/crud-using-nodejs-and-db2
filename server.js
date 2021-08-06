@@ -98,7 +98,7 @@ app.get('/getEmployees', function(request, response) {
       console.log(err);
       return response.json({success:-1, message:err});
     }
-    conn.query("SELECT EMPNO,FIRSTNME,LASTNAME,JOB FROM "+process.env.DB_SCHEMA+".EMPLOYEE;", function (err,data) {
+    conn.querySync("SELECT EMPNO,FIRSTNME,LASTNAME,JOB FROM "+process.env.DB_SCHEMA+".EMPLOYEE;", function (err,data) {
       if (err){
         console.log(err);
         return response.json({success:-2,message:err});
