@@ -53,13 +53,16 @@ app.get('/getProducts', function(request, response) {
   console.log("Request for /getProducts");
   ibmdb.open(connStr, function (err,conn) {
     if (err){
+      console.log(err);
       return response.json({success:-1, message:err});
     }
     conn.query("SELECT * FROM "+process.env.DB_SCHEMA+".PRODUCT;", function (err,data) {
       if (err){
+        console.log(err);
         return response.json({success:-2,message:err});
       }
       conn.close(function () {
+        console.log("Response provided");
         return response.json({success:1, message:'Data Received', data:data});
       });
     })
@@ -71,13 +74,16 @@ app.get('/getEmployee', function(request, response) {
   console.log("Request for /getEmployee with Employee Number "+request.query.id);
   ibmdb.open(connStr, function (err,conn) {
     if (err){
+      console.log(err);
       return response.json({success:-1, message:err});
     }
     conn.query("SELECT * FROM "+process.env.DB_SCHEMA+".EMPLOYEE WHERE EMPNO="+request.query.id+";", function (err,data) {
       if (err){
+        console.log(err);
         return response.json({success:-2,message:err});
       }
       conn.close(function () {
+        console.log("Response provided");
         return response.json({success:1, message:'Data Received', data:data});
       });
     })
@@ -89,13 +95,16 @@ app.get('/getEmployees', function(request, response) {
   console.log("Request for /getEmployees");
   ibmdb.open(connStr, function (err,conn) {
     if (err){
+      console.log(err);
       return response.json({success:-1, message:err});
     }
     conn.query("SELECT EMPNO,FIRSTNME,LASTNAME,JOB FROM "+process.env.DB_SCHEMA+".EMPLOYEE;", function (err,data) {
       if (err){
+        console.log(err);
         return response.json({success:-2,message:err});
       }
       conn.close(function () {
+        console.log("Response provided");
         return response.json({success:1, message:'Data Received!', data:data});
       });
     })
