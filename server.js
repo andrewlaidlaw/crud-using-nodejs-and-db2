@@ -98,7 +98,7 @@ app.get('/getEmployees', function(request, response) {
       console.log(err);
       return response.json({success:-1, message:err});
     }
-    conn.querySync("SELECT EMPNO,FIRSTNME,LASTNAME,JOB FROM "+process.env.DB_SCHEMA+".EMPLOYEE;", function (err,data) {
+    conn.query("SELECT EMPNO,FIRSTNME,LASTNAME,JOB FROM "+process.env.DB_SCHEMA+".EMPLOYEE;", function (err,data) {
       if (err){
         console.log(err);
         return response.json({success:-2,message:err});
@@ -111,6 +111,22 @@ app.get('/getEmployees', function(request, response) {
   })
 })
 
+// Get an object containing limited details of all employees in the database
+app.get('/getEmps', function(request, response) {
+  console.log("Request for /getEmps");
+  ibmdb.open(connStr, function (err,conn) {
+    if (err){
+      console.log(err);
+      return response.json({success:-1, message:err});
+    }
+    var output = conn.querySync("SELECT EMPNO,FIRSTNME,LASTNAME,JOB FROM "+process.env.DB_SCHEMA+".EMPLOYEE;");
+
+    conn.close(function () {
+      console.log("Response provided");
+      return response.json({success:1, message:'Data Received!', data:output});
+    })
+  })
+})
 
 // The following endpoints are historical from the cloned Github repo, and are not used here
 
