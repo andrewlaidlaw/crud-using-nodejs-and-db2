@@ -2,7 +2,7 @@
 This has been tested with a remote Db2 database running on an AIX system hosted in the IBM CECC. It is part of a wider demo looking at connecting new OpenShift based Cloud applications to data stored in on-premises systems.
 
 ## Usage
-This application presents a number of API endpoints over http to read data from a Db2 database. By default it listens on port 8888.
+This application presents a number of API endpoints over http to read data from a Db2 database. By default it listens on port 8080.
 
 Host details and user credentials are stored in a local `.env` file as variables.
 
