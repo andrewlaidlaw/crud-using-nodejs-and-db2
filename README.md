@@ -12,8 +12,10 @@ The data to use comes from the sample dataset available with the Db2 installer, 
 `/getProducts` provides a JSON object where `data` is an array of products with relevant information.
 
 `/getEmployees` provides a JSON objcet where `data` is an array of employees with limited information.
+Returns the employee number, first name, last name and job title of each employee.
 
 `/getAllEmployees` provides a JSON objcet where `data` is an array of employees with limited information.
+Returns the employee number, first name, last name, job title, and department name of each employee. This uses a table join in the Db2 query.
 
 `/getEmployee` expects an input value of `id` which is the employee number. It then returns the full information record of that employee in the `data` component of the returned JSON object.
 
